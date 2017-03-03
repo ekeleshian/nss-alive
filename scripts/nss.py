@@ -14,9 +14,9 @@ def make_convert (file_path):
         sheet_format = '.csv'
         sfile = '{}{}{}'.format(sheet_file,sheet_name,sheet_format)
         with open(sfile, 'w') as csvFile:
-            for rows in range(sheets[sheet_file].nrows):
+            for rows in range(sheets[sheet_index].nrows):
                 writer = csv.writer(csvFile, quoting=csv.QUOTE_MINIMAL)
-                writer.writerow(sheets[sheet_file].row_values(rows))0
+                writer.writerow(sheets[sheet_index].row_values(rows))
 make_convert('./junk/99501863.xlsx')
 # if __name__ == '__main__':
 #     print("Hello World")
