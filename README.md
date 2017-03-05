@@ -23,4 +23,9 @@ $ sudo aptitude install python3-pip -y
 
 Then I recommend you update `pip3` itself with `pip3 install --upgrade pip`
 
-To install the `Python` requirements, you'll need to run `$ npm run pyrequire`
+To install the `Python` requirements, you'll need to run `$ npm run
+pyrequire`. If you look in the `requirements.txt` file you'll see two
+pacakges, one is `requests`, we will use that for `HTTP` requests and
+the other is `xlrd`, this is a package to read and handle `Excel`
+files. 
+
