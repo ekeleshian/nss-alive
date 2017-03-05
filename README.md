@@ -13,6 +13,8 @@ Building
 
 # Setting up the project for first time
 
+## Python
+
 You'll need to have `Python` installed, we are using
 `Python3`. Assuming you are on `Debian` based distribution, aka
 `Debian` or `Ubuntu`, then you do:
@@ -28,4 +30,24 @@ pyrequire`. If you look in the `requirements.txt` file you'll see two
 pacakges, one is `requests`, we will use that for `HTTP` requests and
 the other is `xlrd`, this is a package to read and handle `Excel`
 files. 
+
+## node
+
+Now you need to have the `node` part of the project working, for that
+just do
+
+```shell
+$ npm install
+```
+
+Developing
+----------
+
+If you're working on the `JavaScript` part of the project, then you
+need to open a shell and just run `npm run watch`, and that will:
+
+1. Restart the server when there's a change in backend code. 
+2. Recompile the front end code whenever there is a `JSX` change. 
+3. Bundle the code up for the front end
+
 
