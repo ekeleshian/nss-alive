@@ -17,10 +17,12 @@ export default () => {
 
   return (
     <div style={topMenuStyle}>
-      <img src="http://hyechat.herokuapp.com/logo.png" style={logoStyle}></img>
-      <ul style={topMenuListStyle}>
-        {listItems}
-      </ul>
+      <div style={containerStyle} className={'container'}>
+        <img src="http://hyechat.herokuapp.com/logo.png" style={logoStyle}></img>
+        <ul style={topMenuListStyle}>
+          {listItems}
+        </ul>
+      </div>
     </div>
   );
 };
@@ -44,11 +46,14 @@ const logoStyle = {
   marginRight: '30px',
 };
 
+const containerStyle = {
+  display: 'flex',
+}
+
 const topMenuStyle = {
   display: 'flex',
-  padding: '0 10%',
   width: '100%',
-  backgroundColor: '#222222',
+  backgroundColor: '#3E424E',
   color: 'white',
-  height: '50px',
+  height: '5vh',
 };
