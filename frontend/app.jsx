@@ -1,11 +1,15 @@
 import React from 'react';
 import { render } from 'react-dom';
 import TopMenu from '../lib/views/menu-top';
+import Footer from '../lib/views/footer';
+import MainBody from '../lib/views/layout';
 
 const Application = ({name, handler}) => {
   return (
     <div>
       <TopMenu />
+      <MainBody />
+      <Footer />
     </div>
   );
 };
