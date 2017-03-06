@@ -1,9 +1,12 @@
 import React from 'react';
 import { render } from 'react-dom';
+import TopMenu from '../lib/views/menu-top';
 
 const Application = ({name, handler}) => {
   return (
-    <div onClick={handler}> Hello {name} </div>
+    <div>
+      <TopMenu />
+    </div>
   );
 };
 
