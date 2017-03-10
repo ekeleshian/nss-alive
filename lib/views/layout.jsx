@@ -12,6 +12,11 @@ class MainBody extends Component {
     this.state = { language: 'eng', city: 'whatever' };
   }
 
+  async componentDidMount() {
+    const a = await fetch('http://localhost:8080/En.json');
+    console.log(a);
+  }
+
   render() {
     return(
       <div>
