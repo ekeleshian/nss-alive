@@ -39,6 +39,8 @@ const listItemStyle = {
 
 const topMenuListStyle = {
   alignItems: 'center',
+  listStyle: 'none',
+  display: 'flex',
 };
 
 const logoStyle = {
