@@ -22,7 +22,10 @@ module.exports = {
         exclude:/node_modules/,
         query: {
           // Here you can put plugins, like plugins:['transform-runtime']
-          plugins:['transform-class-properties'],
+          plugins:[
+	    'transform-class-properties',
+            'transform-async-to-generator'
+	  ],
           presets: ['es2015', 'react', 'stage-3']
         }
       }]
