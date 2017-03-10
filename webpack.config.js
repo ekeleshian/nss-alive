@@ -24,7 +24,9 @@ module.exports = {
           // Here you can put plugins, like plugins:['transform-runtime']
           plugins:[
 	    'transform-class-properties',
-            'transform-async-to-generator'
+            'transform-async-to-generator',
+	    // This is for async, await on the front end.
+	    'transform-runtime'
 	  ],
           presets: ['es2015', 'react', 'stage-3']
         }
