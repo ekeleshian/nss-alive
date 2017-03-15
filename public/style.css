@@ -7,11 +7,6 @@ html { box-sizing: border-box; }
 html, body { height: 100% }
 *, *:before, *:after { box-sizing: inherit; }
 
-ul {
-  list-style: none;
-  display: flex;
-}
-
 div {
   width: 100%;
 }
@@ -42,4 +37,12 @@ div {
   height: 100%;
   width: 80%;
   margin: 0px auto;
+}
+
+.y-axis {
+  font: 14px sans-serif;
+}
+
+.x-axis {
+  font-size: 7px;
 }

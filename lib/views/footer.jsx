@@ -61,6 +61,8 @@ const footerListItemStyle = {
 };
 
 const footerItemsContainer = {
+  display: 'flex',
+  listStyle: 'none',
   alignItems: 'center',
 };
 
