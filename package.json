@@ -12,7 +12,8 @@
     "query-nss": "python3 scripts/nss.py",
     "watch": "node scripts/watch-project.js",
     "webpack-watch": "NODE_ENV='debug' webpack --progress -d --colors --watch",
-    "server-watch": "NODE_ENV='debug' nodemon backend/server.js"
+    "server-watch": "NODE_ENV='debug' nodemon backend/server.js",
+    "create-db": "cat backend/setup-database.sql | sqlite3 nss-alive.db"
   },
   "repository": {
     "type": "git",
