@@ -16,10 +16,10 @@ CREATE TABLE favorite_user_graph (
     link text NOT NULL
 );
 
-CREATE TABLE central_gov_debt ( 
+CREATE TABLE central_gov_debt (
     id INTEGER PRIMARY KEY autoincrement,
     -- Its a quarterly basis
-    time_period TEXT NOT NULL, 
+    time_period TEXT NOT NULL,
     -- In billions of dram
     domestic_debt_long_term_dram TEXT NOT NULL,
     domestic_debt_short_term_dram TEXT NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE government_operations (
 );
 
 CREATE TABLE query_source_result (
-    id INTEGER PRIMARY KEY autoincrement,
+    id INTEGER PRIMARY KEY,
     download_date INTEGER NOT NULL,
     checksum TEXT NOT NULL,
     FOREIGN KEY (checksum) REFERENCES source_link(ID)

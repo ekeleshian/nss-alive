@@ -9,6 +9,8 @@ measures of economic well being.
 import os
 import tempfile
 import sqlite3
+import hashlib
+import datetime
 
 import requests
 import xlrd
@@ -26,18 +28,25 @@ class QueryHandler:
         self.cursor.execute('select * from source_link')
         return self.cursor.fetchall()
 
+    def persist_hash_result(self, digest, record):
+        '''Persist the hash of a download from a source for today'''
+        self.cursor.execute('''
+insert into query_source_result (id, download_date, checksum)
+values (?, ?, ?)
+''', (record['id'], datetime.datetime.now().timestamp(), digest))
+
     def run_query(self, query):
         '''Get back all the records for a query'''
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
 
-def produce_data(db_name):
+def produce_data(db_handle):
     '''
     Download the data from the links kept in the DB,
     gives back (excel_files, pdf_files) iterators
     '''
-    links_source = QueryHandler(db_name).source_links()
+    links_source = db_handle.source_links()
     results = []
     for record in links_source:
         (_, ext) = os.path.splitext(record[5])
@@ -48,6 +57,7 @@ def produce_data(db_name):
                 'frequency':record[2],
                 'data-category':'excel' if ext in ('.xlsx', '.xls') else 'pdf',
                 'description':record[4],
+                # Use content instead of text since need as binary
                 'download-result':requests.get(record[5]).content
             })
         except requests.RequestException as e:
@@ -60,37 +70,39 @@ def produce_data(db_name):
     return (excel_files, pdf_files)
 
 
-# def make_convert (file_path):
-#     junkfile = file_path
-#     junkopen = xlrd.open_workbook(junkfile)
-#     sheet_names = junkopen.sheet_names()
-#     sheets = junkopen.sheets()
-#     for sheet_index in range(len(sheets)):
-#         sheet_file = './junk/'
-#         sheet_name = sheet_names[sheet_index]
-#         sheet_format = '.csv'
-#         sfile = '{}{}{}'.format(sheet_file,sheet_name,sheet_format)
-#         with open(sfile, 'w') as csvFile:
-#             for rows in range(sheets[sheet_index].nrows):
-#                 writer = csv.writer(csvFile, quoting=csv.QUOTE_MINIMAL)
-#                 writer.writerow(sheets[sheet_index].row_values(rows))
+def handle_central_gov_debt(work_book, db_handle):
+    '''Persist the central government debt'''
+    sheet_en = work_book.sheet_by_name('En')
 
 
-def process_excel(excel_files):
+def handle_general_gov_ops(work_book, db_handle):
+    # Inconsistent naming
+    sheet_en = work_book.sheet_by_name('Eng')
+
+
+def persist_digest(record, db_handle):
+    '''Persist the MD5 digest of a downloaded dataset'''
+    md5 = hashlib.md5()
+    md5.update(record['download-result'])
+    digest = md5.digest()
+    db_handle.persist_hash_result(digest)
+
+
+def process_excel(excel_files, db_handle):
     '''Process the excel data, use a temp file to write the results'''
     (_, temp_file) = tempfile.mkstemp()
     for record in excel_files:
         try:
+            persist_digest(record, db_handle)
             with open(temp_file, 'wb') as ex_file:
                 ex_file.write(record['download-result'])
             xlrd_handle = xlrd.open_workbook(temp_file)
             if record['description'] == 'Central Government Debt':
-                pass
+                handle_central_gov_debt(xlrd_handle, db_handle)
             elif record['description'] == 'General Government Operations':
-                pass
+                handle_general_gov_ops(xlrd_handle, db_handle)
             else:
                 raise Exception('Unknown description {}'.format(str(record)))
-            # some code
         except Exception as e:
             print(e)
     os.remove(temp_file)
@@ -106,8 +118,9 @@ def process_excel(excel_files):
 def pipeline(dbname, sources):
     '''Entry point of our program'''
     print('Starting processing...{}\n'.format(str(sources)))
-    (excel_files, pdf_files) = produce_data(dbname)
-    process_excel(excel_files)
+    db_handle = QueryHandler(dbname)
+    (excel_files, pdf_files) = produce_data(db_handle)
+    process_excel(excel_files, db_handle)
 
 
 if __name__ == '__main__':
