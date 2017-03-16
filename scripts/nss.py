@@ -13,7 +13,7 @@ import hashlib
 import datetime
 
 import requests
-import xlrd
+import pandas
 import click
 
 
@@ -69,15 +69,22 @@ def produce_data(db_handle):
                        results)
     return (excel_files, pdf_files)
 
+from pdb import set_trace
 
-def handle_central_gov_debt(work_book, db_handle):
+def handle_central_gov_debt(temp_file, db_handle):
     '''Persist the central government debt'''
-    sheet_en = work_book.sheet_by_name('En')
+    dframe = pandas.read_excel('file://localhost{path}'.format(path=temp_file),
+                               sheetname=['En'],
+                               skiprows=[0, 1, 2, 11, 23, 24])
+    as_dict = dframe['En'][:17].T.to_dict()
+    cleaned_up = {as_dict[key]['Unnamed: 0']: as_dict[key] for key in as_dict}
+    for key in cleaned_up:
+        cleaned_up[key].pop('Unnamed: 0')
 
 
 def handle_general_gov_ops(work_book, db_handle):
     # Inconsistent naming
-    sheet_en = work_book.sheet_by_name('Eng')
+    pass
 
 
 def persist_digest(record, db_handle):
@@ -85,22 +92,24 @@ def persist_digest(record, db_handle):
     md5 = hashlib.md5()
     md5.update(record['download-result'])
     digest = md5.digest()
-    db_handle.persist_hash_result(digest)
+    db_handle.persist_hash_result(digest, record)
 
 
 def process_excel(excel_files, db_handle):
     '''Process the excel data, use a temp file to write the results'''
     (_, temp_file) = tempfile.mkstemp()
+
     for record in excel_files:
         try:
-            persist_digest(record, db_handle)
+            # persist_digest(record, db_handle)
             with open(temp_file, 'wb') as ex_file:
                 ex_file.write(record['download-result'])
-            xlrd_handle = xlrd.open_workbook(temp_file)
+
             if record['description'] == 'Central Government Debt':
-                handle_central_gov_debt(xlrd_handle, db_handle)
+                handle_central_gov_debt(temp_file, db_handle)
             elif record['description'] == 'General Government Operations':
-                handle_general_gov_ops(xlrd_handle, db_handle)
+                pass
+                # handle_general_gov_ops(xlrd_handle, db_handle)
             else:
                 raise Exception('Unknown description {}'.format(str(record)))
         except Exception as e:
