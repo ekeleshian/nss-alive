@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+
+'''
+Python based processing of Armenian
+government statistics and other valuable
+measures of economic well being.
+'''
+
 import os
 import tempfile
 import sqlite3
