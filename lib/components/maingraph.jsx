@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import routes from '../http-routes';
-//import { LineChart } from 'rd3'
 import {
   XYPlot,
   XAxis,
@@ -16,39 +15,13 @@ import {
 import * as d3 from 'd3';
 
 const FlexibleXYPlot = makeWidthFlexible(XYPlot);
-const ui = routes.ui_routes;
 
 export default
-
-class MainBody extends Component {
+class MainGraph extends Component {
   constructor() {
     super();
     this.state = {
       crosshairValues: [],
-      currentSeries: {title: '', disabled: false, data:[
-                {x: 1, y: 1},
-                {x: 2, y: 2},
-                {x: 3, y: 0},
-                {x: 4, y: 3},
-                {x: 5, y: 2},
-                {x: 6, y: 3},
-                {x: 7, y: 4},
-                {x: 8, y: 4},
-                {x: 9, y: 1},
-                {x: 10, y: 5},
-                {x: 11, y: 0},
-                {x: 12, y: 1},
-                {x: 13, y: 1},
-                {x: 14, y: 4},
-                {x: 15, y: 4},
-                {x: 16, y: 5},
-                {x: 17, y: 5},
-                {x: 18, y: 5},
-                {x: 19, y: 1},
-                {x: 20, y: 0},
-                {x: 21, y: 1},
-                {x: 22, y: 1}
-      ]},
       series: [{title: 'Smth', disabled: false, data:[
                 {x: 1, y: 1},
                 {x: 2, y: 2},
@@ -96,7 +69,6 @@ class MainBody extends Component {
                 {x: 21, y: 1},
                 {x: 22, y: 1}
       ]}],
-      graphID: 0,
       language: 'eng',
       city: 'whatever'
     };
@@ -111,7 +83,7 @@ class MainBody extends Component {
   }
 
   nearestXHandler = (value, {index}) => {
-   const {currentSeries, series} = this.state;
+   const {series} = this.state;
    this.setState({
       crosshairValues: series.map(s => s.data[index])
     });
@@ -164,67 +136,41 @@ class MainBody extends Component {
   }
 
   render() {
-    const {currentSeries, series, crosshairValues, graphID} = this.state;
-    const otherID = (graphID + 1) % 2
+    const {series, crosshairValues} = this.state;
     return(
-      <div>
-        <div className={'container'}>
-          <div style={dateRangeContainer}></div>
-          <div style={sliderRangeContainer}></div>
-          <div className={'graph1'} style={mainGraphContainer}>
-            <DiscreteColorLegend
-              onItemClick={this.legendClickHandler}
-              width={180}
-              items={series}
+      <div className={'graph1'} style={this.props.style}>
+        <DiscreteColorLegend
+          onItemClick={this.legendClickHandler}
+          width={180}
+          items={series}
+        />
+        <FlexibleXYPlot
+          animation
+          onMouseLeave={this.mouseLeaveHandler}
+          height={300}>
+          <HorizontalGridLines />
+          <YAxis className="y-axis"/>
+          <XAxis className="x-axis"/>
+          <VerticalBarSeries
+            data={series[1].data}
+            onNearestX={this.nearestXHandler}
+            {...(series[1].disabled ? {opacity: 0.2} : null)}
+          />
+          <LineSeries
+            data={series[0].data}
+            curve="curveMonotoneX"
+            {...(series[0].disabled ? {opacity: 0.2} : null)}
             />
-            <FlexibleXYPlot
-              animation
-              onMouseLeave={this.mouseLeaveHandler}
-              height={300}>
-              <HorizontalGridLines />
-              <YAxis className="y-axis"/>
-              <XAxis className="x-axis"/>
-              <VerticalBarSeries
-                data={series[1].data}
-                onNearestX={this.nearestXHandler}
-                {...(series[1].disabled ? {opacity: 0.2} : null)}
-              />
-              <LineSeries
-                data={series[0].data}
-                curve="curveMonotoneX"
-                {...(series[0].disabled ? {opacity: 0.2} : null)}
-                />
-              <Crosshair
-                itemsFormat={this.formatCrosshairItems}
-                titleFormat={this.formatCrosshairTitle}
-                values={crosshairValues}
-              />
-            </FlexibleXYPlot>
-            <button className="click-me" onClick={this.updateGraph}>
-              Click to update
-            </button>
-          </div>
-          <div style={otherGraphsContainer}></div>
-        </div>
+          <Crosshair
+            itemsFormat={this.formatCrosshairItems}
+            titleFormat={this.formatCrosshairTitle}
+            values={crosshairValues}
+          />
+        </FlexibleXYPlot>
+        <button className="click-me" onClick={this.updateGraph}>
+          Click to update
+        </button>
       </div>
     );
   }
 }
-
-const baseVH = 5;
-
-const dateRangeContainer = {
-  height: `${baseVH}vh`
-};
-
-const sliderRangeContainer = {
-  height: `${2 * baseVH}vh`
-};
-
-const mainGraphContainer = {
-  height: `${5 * baseVH}vh`
-};
-
-const otherGraphsContainer = {
-  height: `${10 * baseVH}vh`
-};

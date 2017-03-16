@@ -4,6 +4,6 @@ import routes from './http-routes';
 
 const ui = routes.ui_routes;
 
-// export default (
-//   <Route path={ui.home.resource} component
-// );
+export default (
+  <Route path={ui.home.resource} component
+);
