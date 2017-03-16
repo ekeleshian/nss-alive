@@ -9,6 +9,7 @@ measures of economic well being.
 import os
 import tempfile
 import sqlite3
+
 import requests
 import xlrd
 import click
@@ -47,8 +48,9 @@ def produce_data(db_name):
                 'frequency':record[2],
                 'data-category':'excel' if ext in ('.xlsx', '.xls') else 'pdf',
                 'description':record[4],
-                'download-result':requests.get(record[5]).text})
-        except Exception as e:
+                'download-result':requests.get(record[5]).content
+            })
+        except requests.RequestException as e:
             print(e)
 
     excel_files = filter(lambda s: s['data-category'] == 'excel',
@@ -77,28 +79,35 @@ def produce_data(db_name):
 def process_excel(excel_files):
     '''Process the excel data, use a temp file to write the results'''
     (_, temp_file) = tempfile.mkstemp()
-    for document in excel_files:
+    for record in excel_files:
         try:
-            with open(temp_file, 'w') as ex_file:
-                ex_file.write(document)
+            with open(temp_file, 'wb') as ex_file:
+                ex_file.write(record['download-result'])
+            xlrd_handle = xlrd.open_workbook(temp_file)
+            if record['description'] == 'Central Government Debt':
+                pass
+            elif record['description'] == 'General Government Operations':
+                pass
+            else:
+                raise Exception('Unknown description {}'.format(str(record)))
             # some code
         except Exception as e:
-            print('Not sure what happened')
             print(e)
     os.remove(temp_file)
 
-    # Process results according to if it is a PDF or an Excel file
 
 @click.command()
+@click.option('--dbname', default='nss-alive.db', help='Path to the sqlite database')
 @click.option('--sources',
               default=['ArmStat', 'Tax Service'],
               help=
               'Where we should source data from, '
               'can be ArmStat or Tax Service')
-def pipeline(sources):
+def pipeline(dbname, sources):
     '''Entry point of our program'''
-    print('Starting processing...', sources)
-
+    print('Starting processing...{}\n'.format(str(sources)))
+    (excel_files, pdf_files) = produce_data(dbname)
+    process_excel(excel_files)
 
 
 if __name__ == '__main__':
