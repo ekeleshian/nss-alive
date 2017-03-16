@@ -1,4 +1,11 @@
 /*  Basic resets for modern browsers */
+@import "style1.css";
+@import "stlyes/examples.css";
+@import "styles/legends.css";
+@import "styles/plot.css";
+@import "styles/radial-chart.css";
+@import "styles/treemap.css";
+
 * {
   margin:0; padding:0;
   font-family: 'Roboto', sans-serif;
@@ -6,10 +13,6 @@
 html { box-sizing: border-box; }
 html, body { height: 100% }
 *, *:before, *:after { box-sizing: inherit; }
-
-div {
-  width: 100%;
-}
 
 .material-icons {
   padding: 10px;
@@ -39,8 +42,49 @@ div {
   margin: 0px auto;
 }
 
+.click-me {
+  border: 0;
+  background: #ef5d28;
+  color: #fff;
+  cursor: pointer;
+  font-family: Sintony, Helvetica, sans-serif;
+  font-size: 14px;
+  outline: none;
+  padding: 11px 20px;
+  text-transform: uppercase;
+  animation: shake 5s 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) both infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.click-me:hover {
+  background: #ff9833;
+}
+
+@keyframes shake {
+    1%,
+  9% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  2%,
+  8% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  3%,
+  5%,
+  7% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  4%,
+  6% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
 .y-axis {
-  font: 14px sans-serif;
+  font: 10px sans-serif;
 }
 
 .x-axis {
