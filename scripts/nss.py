@@ -1,7 +1,9 @@
-import csv
+import os
+import tempfile
 import sqlite3
 import requests
 import xlrd
+import click
 
 
 class QueryHandler:
@@ -24,33 +26,29 @@ class QueryHandler:
 def produce_data(db_name):
     '''
     Download the data from the links kept in the DB,
-    gives back (excel_files, pdf_files)
+    gives back (excel_files, pdf_files) iterators
     '''
     links_source = QueryHandler(db_name).source_links()
     results = []
     for record in links_source:
+        (_, ext) = os.path.splitext(record[5])
         try:
-            results.append({'data-category':record[2],
-                            'result':requests.get(record[3]).text})
+            results.append({
+                'id':record[0],
+                'source-name':record[1],
+                'frequency':record[2],
+                'data-category':'excel' if ext in ('.xlsx', '.xls') else 'pdf',
+                'description':record[4],
+                'download-result':requests.get(record[5]).text})
         except Exception as e:
             print(e)
 
-    excel_files = filter(lambda s : s['data-category'] == 'excel',
+    excel_files = filter(lambda s: s['data-category'] == 'excel',
                          results)
-    pdf_files = filter(lambda s : s['data-category'] == 'pdf',
+    pdf_files = filter(lambda s: s['data-category'] == 'pdf',
                        results)
     return (excel_files, pdf_files)
 
-
-def process_excel(excel_files):
-    for document in excel_files:
-        try:
-            # some code
-        except Exception as e:
-            print('Not sure what happened')
-            print(e)
-
-    # Process results according to if it is a PDF or an Excel file
 
 # def make_convert (file_path):
 #     junkfile = file_path
@@ -66,6 +64,34 @@ def process_excel(excel_files):
 #             for rows in range(sheets[sheet_index].nrows):
 #                 writer = csv.writer(csvFile, quoting=csv.QUOTE_MINIMAL)
 #                 writer.writerow(sheets[sheet_index].row_values(rows))
-# make_convert('./junk/99501863.xlsx')
-# if __name__ == '__main__':
-#     print("Hello World")
+
+
+def process_excel(excel_files):
+    '''Process the excel data, use a temp file to write the results'''
+    (_, temp_file) = tempfile.mkstemp()
+    for document in excel_files:
+        try:
+            with open(temp_file, 'w') as ex_file:
+                ex_file.write(document)
+            # some code
+        except Exception as e:
+            print('Not sure what happened')
+            print(e)
+    os.remove(temp_file)
+
+    # Process results according to if it is a PDF or an Excel file
+
+@click.command()
+@click.option('--sources',
+              default=['ArmStat', 'Tax Service'],
+              help=
+              'Where we should source data from, '
+              'can be ArmStat or Tax Service')
+def pipeline(sources):
+    '''Entry point of our program'''
+    print('Starting processing...', sources)
+
+
+
+if __name__ == '__main__':
+    pipeline()
