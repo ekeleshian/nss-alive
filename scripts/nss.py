@@ -16,6 +16,7 @@ import requests
 import pandas
 import click
 
+from pdb import set_trace
 
 class QueryHandler:
     '''Object to provide querying to our db'''
@@ -39,6 +40,26 @@ values (?, ?, ?)
         '''Get back all the records for a query'''
         self.cursor.execute(query)
         return self.cursor.fetchall()
+
+    def persist_gov_debt(self, gov_records):
+        # This is more useful if reversed
+        legend = gov_records.pop('Legend')
+        query = '''
+insert into central_gov_debt (
+time_period,
+domestic_debt_long_term_dram,
+domestic_debt_short_term_dram,
+total_external_debt_usd,
+multilateral_debt_usd,
+bilateral_debt_usd,
+central_bank_guaranteed_usd
+) values (?, ?, ?, ?, ?, ?, ?)
+'''
+        for quarter in gov_records:
+            data = gov_records[quarter]
+            params = (quarter, data[2], data[3], data[0], data[14], data[15], data[16])
+            with self.conn:
+                self.cursor.execute(query, params)
 
 
 def produce_data(db_handle):
@@ -69,17 +90,15 @@ def produce_data(db_handle):
                        results)
     return (excel_files, pdf_files)
 
-from pdb import set_trace
 
 def handle_central_gov_debt(temp_file, db_handle):
     '''Persist the central government debt'''
     dframe = pandas.read_excel('file://localhost{path}'.format(path=temp_file),
                                sheetname=['En'],
                                skiprows=[0, 1, 2, 11, 23, 24])
-    as_dict = dframe['En'][:17].T.to_dict()
-    cleaned_up = {as_dict[key]['Unnamed: 0']: as_dict[key] for key in as_dict}
-    for key in cleaned_up:
-        cleaned_up[key].pop('Unnamed: 0')
+    as_dict = dframe['En'][:17].to_dict()
+    as_dict['Legend'] = as_dict.pop('Unnamed: 0')
+    db_handle.persist_gov_debt(as_dict)
 
 
 def handle_general_gov_ops(work_book, db_handle):
