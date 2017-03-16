@@ -11,6 +11,7 @@
     "pyrequire": "pip3 install -r requirements.txt",
     "query-nss": "python3 scripts/nss.py",
     "watch": "node scripts/watch-project.js",
+    "babel-watch": "NODE_ENV='debug' babel lib/*.jsx --watch --out-dir .",
     "webpack-watch": "NODE_ENV='debug' webpack --progress -d --colors --watch",
     "server-watch": "NODE_ENV='debug' nodemon backend/server.js",
     "create-db": "cat backend/setup-database.sql | sqlite3 nss-alive.db"
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "babel": "^6.23.0",
+    "babel-cli": "^6.24.0",
     "babel-core": "^6.23.1",
     "babel-loader": "^6.3.2",
     "babel-plugin-transform-async-to-generator": "^6.22.0",

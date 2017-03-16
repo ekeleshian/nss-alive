@@ -81,8 +81,8 @@ def produce_data(db_handle):
                 # Use content instead of text since need as binary
                 'download-result':requests.get(record[5]).content
             })
-        except requests.RequestException as e:
-            print(e)
+        except requests.RequestException as request_error:
+            print(request_error)
 
     excel_files = filter(lambda s: s['data-category'] == 'excel',
                          results)
