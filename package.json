@@ -22,7 +22,7 @@
     "pyrequire": "pip3 install -r requirements.txt",
     "query-nss": "python3 scripts/nss.py",
     "watch": "node scripts/watch-project.js",
-    "babel-watch": "NODE_ENV='debug' babel lib/*.jsx --watch --out-dir .",
+    "babel-watch": "NODE_ENV='debug' babel lib/*.jsx lib/components/*.jsx --watch --out-dir .",
     "webpack-watch": "NODE_ENV='debug' webpack --progress -d --colors --watch",
     "server-watch": "NODE_ENV='debug' nodemon backend/server.js",
     "create-db": "cat backend/setup-database.sql | sqlite3 nss-alive.db"
@@ -40,10 +40,12 @@
   "dependencies": {
     "d3": "^4.7.3",
     "express": "^4.15.2",
+    "history": "^4.6.1",
     "react": "^15.4.2",
     "react-addons-shallow-compare": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-router": "^4.0.0",
+    "react-router-dom": "^4.0.0",
     "react-vis": "^1.0.1",
     "sqlite3": "^3.1.8"
   },

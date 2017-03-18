@@ -1,10 +1,5 @@
 /*  Basic resets for modern browsers */
-@import "style1.css";
-@import "stlyes/examples.css";
-@import "styles/legends.css";
-@import "styles/plot.css";
-@import "styles/radial-chart.css";
-@import "styles/treemap.css";
+@import "graphs.css";
 
 * {
   margin:0; padding:0;

@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const {match, RouterContext} = require('react-router');
+const {match, RouterContext} = require('react-router-dom');
 const routes = require('../lib/routes');
 const nss_alive = express();
 
