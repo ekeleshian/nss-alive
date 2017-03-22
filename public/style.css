@@ -9,6 +9,11 @@ html { box-sizing: border-box; }
 html, body { height: 100% }
 *, *:before, *:after { box-sizing: inherit; }
 
+a {
+  text-decoration: none;
+  color: white;
+}
+
 .material-icons {
   padding: 10px;
 }
