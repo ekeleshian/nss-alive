@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import MainGraph from './maingraph'
+import { Link, Route } from 'react-router-dom';
+import MainGraph from './maingraph';
 import routes from '../http-routes';
 
 const ui = routes.ui_routes;
@@ -16,14 +16,22 @@ class MainBody extends Component {
     };
   }
   render() {
-    const {currentSeries, series, crosshairValues, graphID} = this.state;
-    const otherID = (graphID + 1) % 2
+    const { match } = this.props;
+    const graphId = match.params.graphId || '';
     return(
       <div>
         <div className={'container'}>
           <div style={dateRangeContainer}></div>
           <div style={sliderRangeContainer}></div>
-          <MainGraph style={mainGraphContainer} />
+          <div style={mainGraphContainer}>
+            <MainGraph graphId={graphId} />
+            <Link className="click-me" to={`/ddebt`}>
+              Domestic debt
+            </Link>
+            <Link className="click-me" to={`/gdebt`}>
+              Gross debt
+            </Link>
+          </div>
           <div style={otherGraphsContainer}></div>
         </div>
       </div>

@@ -22,70 +22,21 @@ class MainGraph extends Component {
     super();
     this.state = {
       crosshairValues: [],
-      series: [{title: 'Smth', disabled: false, data:[
-                {x: 1, y: 1},
-                {x: 2, y: 2},
-                {x: 3, y: 0},
-                {x: 4, y: 3},
-                {x: 5, y: 2},
-                {x: 6, y: 3},
-                {x: 7, y: 4},
-                {x: 8, y: 4},
-                {x: 9, y: 1},
-                {x: 10, y: 5},
-                {x: 11, y: 0},
-                {x: 12, y: 1},
-                {x: 13, y: 1},
-                {x: 14, y: 4},
-                {x: 15, y: 4},
-                {x: 16, y: 5},
-                {x: 17, y: 5},
-                {x: 18, y: 5},
-                {x: 19, y: 1},
-                {x: 20, y: 0},
-                {x: 21, y: 1},
-                {x: 22, y: 1}
-      ]}, {title: 'Smth', disabled: false, data:[
-                {x: 1, y: 1},
-                {x: 2, y: 2},
-                {x: 3, y: 0},
-                {x: 4, y: 3},
-                {x: 5, y: 2},
-                {x: 6, y: 3},
-                {x: 7, y: 4},
-                {x: 8, y: 4},
-                {x: 9, y: 1},
-                {x: 10, y: 5},
-                {x: 11, y: 0},
-                {x: 12, y: 1},
-                {x: 13, y: 1},
-                {x: 14, y: 4},
-                {x: 15, y: 4},
-                {x: 16, y: 5},
-                {x: 17, y: 5},
-                {x: 18, y: 5},
-                {x: 19, y: 1},
-                {x: 20, y: 0},
-                {x: 21, y: 1},
-                {x: 22, y: 1}
-      ]}],
+      series: [
+        {title: 'Smth', disabled: false, data:[{x: 1, y: 1},]},
+        {title: 'Smth', disabled: false, data:[{x: 1, y: 1}]}
+      ],
+      graphNumber: 0,
       language: 'eng',
       city: 'whatever'
     };
   }
 
-  updateGraph = () => {
-    const {series} = this.state;
-    const tmp = series[0];
-    series[0] = series[1];
-    series[1] = tmp;
-    this.setState({series});
-  }
-
   nearestXHandler = (value, {index}) => {
-   const {series} = this.state;
+    const { series, graphNumber } = this.state;
+    const currentSeries = series[graphNumber];
    this.setState({
-      crosshairValues: series.map(s => s.data[index])
+      crosshairValues: [currentSeries.data[index]] //series.map(s => s.data[index])
     });
   }
 
@@ -102,19 +53,21 @@ class MainGraph extends Component {
   }
 
   formatCrosshairItems = (values) => {
-    const {series} = this.state;
+    const { series, graphNumber } = this.state;
+    const currentSeries = series[graphNumber];
     return values.map((value, idx) => {
       return {
-        title: series[idx].title,
+        title: currentSeries.title,
         value: value.y
       };
     });
   }
 
   legendClickHandler = (item, i) => {
-    const {series} = this.state;
-    series[i].disabled = !series[i].disabled;
-    this.setState({series});
+    const { series, graphNumber } = this.state;
+    const currentSeries = series[graphNumber];
+    currentSeries.disabled = !currentSeries.disabled;
+    this.setState({currentSeries});
   }
 
   async componentDidMount() {
@@ -135,14 +88,24 @@ class MainGraph extends Component {
     this.setState({series})
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { graphId } = nextProps;
+    let graphNumber = 0;
+    if(graphId === 'ddebt') {
+      graphNumber = 1;
+    }
+    this.setState({graphNumber})
+  }
+
   render() {
-    const {series, crosshairValues} = this.state;
+    const {series, crosshairValues, graphNumber} = this.state;
+    const currentSeries = series[graphNumber];
     return(
       <div className={'graph1'} style={this.props.style}>
         <DiscreteColorLegend
           onItemClick={this.legendClickHandler}
           width={180}
-          items={series}
+          items={[currentSeries]}
         />
         <FlexibleXYPlot
           animation
@@ -151,26 +114,26 @@ class MainGraph extends Component {
           <HorizontalGridLines />
           <YAxis className="y-axis"/>
           <XAxis className="x-axis"/>
-          <VerticalBarSeries
-            data={series[1].data}
-            onNearestX={this.nearestXHandler}
-            {...(series[1].disabled ? {opacity: 0.2} : null)}
-          />
           <LineSeries
-            data={series[0].data}
+            data={currentSeries.data}
+            onNearestX={this.nearestXHandler}
             curve="curveMonotoneX"
-            {...(series[0].disabled ? {opacity: 0.2} : null)}
-            />
+            {...(currentSeries.disabled ? {opacity: 0.2} : null)}
+          />
           <Crosshair
             itemsFormat={this.formatCrosshairItems}
             titleFormat={this.formatCrosshairTitle}
             values={crosshairValues}
           />
         </FlexibleXYPlot>
-        <button className="click-me" onClick={this.updateGraph}>
-          Click to update
-        </button>
       </div>
     );
   }
 }
+
+// if you want to use vertical bars :
+// <VerticalBarSeries
+//   data={currentSeries.data}
+//   onNearestX={this.nearestXHandler}
+//   {...(currentSeries.disabled ? {opacity: 0.2} : null)}
+// />
