@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import routes from '../http-routes';
+import RadioSelectorComponent from './colorSelector';
 import {
   XYPlot,
   XAxis,
@@ -13,6 +14,12 @@ import {
   Crosshair
 } from 'react-vis';
 import * as d3 from 'd3';
+
+const colorButtons = [ {name: "default", color: 'rgb(18, 147, 154)'}, 
+  {name: "btnGreen", color:'green'},
+  {name: "btnBlue", color:'blue'},
+  {name: "btnYellow", color:'yellow'},
+  {name: "btnViolet", color:'violet'},];
 
 const FlexibleXYPlot = makeWidthFlexible(XYPlot);
 
@@ -28,8 +35,10 @@ class MainGraph extends Component {
       ],
       graphNumber: 0,
       language: 'eng',
-      city: 'whatever'
+      city: 'whatever',
+      custColor: colorButtons[0].color
     };
+    this.setCustomColor = this.setCustomColor.bind(this);
   }
 
   nearestXHandler = (value, {index}) => {
@@ -97,11 +106,18 @@ class MainGraph extends Component {
     this.setState({graphNumber})
   }
 
+  setCustomColor(clr) {
+    this.setState({...this.state, custColor: clr});
+  }
+
   render() {
-    const {series, crosshairValues, graphNumber} = this.state;
+    const {series, crosshairValues, graphNumber, custColor} = this.state;
     const currentSeries = series[graphNumber];
     return(
       <div className={'graph1'} style={this.props.style}>
+        <RadioSelectorComponent 
+          colorButtons={colorButtons}
+          functionColor={this.setCustomColor}/>
         <DiscreteColorLegend
           onItemClick={this.legendClickHandler}
           width={180}
@@ -116,6 +132,7 @@ class MainGraph extends Component {
           <XAxis className="x-axis"/>
           <LineSeries
             data={currentSeries.data}
+            color={custColor}
             onNearestX={this.nearestXHandler}
             curve="curveMonotoneX"
             {...(currentSeries.disabled ? {opacity: 0.2} : null)}
