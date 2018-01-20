@@ -32,9 +32,9 @@ class QueryHandler:
     def persist_hash_result(self, digest, record):
         '''Persist the hash of a download from a source for today'''
         self.cursor.execute('''
-insert into query_source_result (id, download_date, checksum)
-values (?, ?, ?)
-''', (record['id'], datetime.datetime.now().timestamp(), digest))
+insert into query_source_result (download_date, checksum)
+values (?, ?)
+''', (datetime.datetime.now().timestamp(), digest))
 
     def run_query(self, query):
         '''Get back all the records for a query'''
@@ -73,7 +73,6 @@ def produce_data(db_handle):
         (_, ext) = os.path.splitext(record[5])
         try:
             results.append({
-                'id':record[0],
                 'source-name':record[1],
                 'frequency':record[2],
                 'data-category':'excel' if ext in ('.xlsx', '.xls') else 'pdf',
@@ -111,6 +110,7 @@ def persist_digest(record, db_handle):
     md5 = hashlib.md5()
     md5.update(record['download-result'])
     digest = md5.digest()
+
     db_handle.persist_hash_result(digest, record)
 
 
@@ -120,7 +120,7 @@ def process_excel(excel_files, db_handle):
 
     for record in excel_files:
         try:
-            # persist_digest(record, db_handle)
+            persist_digest(record, db_handle)
             with open(temp_file, 'wb') as ex_file:
                 ex_file.write(record['download-result'])
 
