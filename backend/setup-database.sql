@@ -11,10 +11,6 @@ CREATE TABLE source_link (
     link_url text NOT NULL
 );
 
-CREATE TABLE favorite_user_graph (
-    id INTEGER PRIMARY KEY autoincrement,
-    link text NOT NULL
-);
 
 CREATE TABLE central_gov_debt (
     id INTEGER PRIMARY KEY autoincrement,
