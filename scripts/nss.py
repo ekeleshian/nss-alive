@@ -49,7 +49,7 @@ insert into central_gov_debt (
 time_period,
 domestic_debt_long_term_dram,
 domestic_debt_short_term_dram,
-total_external_debt_usd,
+total_outstanding_debt_usd,
 multilateral_debt_usd,
 bilateral_debt_usd,
 central_bank_guaranteed_usd
@@ -60,7 +60,21 @@ central_bank_guaranteed_usd
             params = (quarter, data[2], data[3], data[0], data[14], data[15], data[16])
             with self.conn:
                 self.cursor.execute(query, params)
-
+    def persist_gov_ops(self, gov_records):
+        # This is more useful if reversed
+        legend = gov_records.pop('Legend')
+        query = '''
+insert into government_operations (
+time_period,
+total_revenue_and_grants,
+total_expenditure
+) values (?, ?, ?)
+'''
+        for quarter in gov_records:
+            data = gov_records[quarter]
+            params = (quarter, data[0], data[1])
+            with self.conn:
+                self.cursor.execute(query, params)
 
 def produce_data(db_handle):
     '''
@@ -100,9 +114,14 @@ def handle_central_gov_debt(temp_file, db_handle):
     db_handle.persist_gov_debt(as_dict)
 
 
-def handle_general_gov_ops(work_book, db_handle):
-    # Inconsistent naming
-    pass
+def handle_general_gov_ops(temp_file, db_handle):
+    dframe = pandas.read_excel('file://localhost{path}'.format(path=temp_file),
+                               sheetname=['Eng'],
+                               skiprows=[0, 1, 2, 12, 13, 14, 24, 25, 26])
+    as_dict = dframe['Eng'][:17].to_dict()
+    as_dict['Legend'] = as_dict.pop('Unnamed: 0')
+    db_handle.persist_gov_ops(as_dict)
+
 
 
 def persist_digest(record, db_handle):
@@ -127,8 +146,7 @@ def process_excel(excel_files, db_handle):
             if record['description'] == 'Central Government Debt':
                 handle_central_gov_debt(temp_file, db_handle)
             elif record['description'] == 'General Government Operations':
-                pass
-                # handle_general_gov_ops(xlrd_handle, db_handle)
+                handle_general_gov_ops(temp_file, db_handle)
             else:
                 raise Exception('Unknown description {}'.format(str(record)))
         except Exception as e:
